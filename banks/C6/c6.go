@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"personal-budget/banks"
 	"personal-budget/domain"
 	"strconv"
 	"strings"
@@ -39,19 +40,22 @@ func ReadFile(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 			continue
 		}
 
+		rawCategory := strings.TrimSpace(row[3])
+		category := strings.TrimSpace(strings.Split(rawCategory, "/")[0])
+		description := strings.TrimSpace(row[4])
 		currentInstallment, totalInstallment := extractInstallment(strings.TrimSpace(row[5]))
 
 		response = append(response, domain.Purchase{
 			Date:               strings.TrimSpace(row[0]),
 			Month:              month,
-			Description:        strings.TrimSpace(row[4]),
+			Description:        description,
 			CurrentInstallment: currentInstallment,
 			TotalInstallment:   totalInstallment,
 			Bank:               bank,
 			Number:             strings.TrimSpace(row[2]),
-			Category:           strings.TrimSpace(strings.Split(strings.TrimSpace(row[3]), "/")[0]),
+			Category:           banks.ConvertCategory(category, description),
 			Value:              strings.ReplaceAll(strings.TrimSpace(row[8]), ".", ","),
-			Tags:               strings.Join(strings.Split(strings.TrimSpace(row[3]), " / "), ","),
+			Tags:               strings.Join(strings.Split(rawCategory, " / "), ","),
 		})
 	}
 
