@@ -1,4 +1,4 @@
-package main
+package invoice
 
 import (
 	"encoding/csv"
@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func main() {
+func Generate() {
 	outFile, err := os.Create("faturas_consolidadas.csv")
 	if err != nil {
 		panic(err)
