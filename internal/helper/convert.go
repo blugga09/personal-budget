@@ -1,12 +1,11 @@
-package banks
+package helper
 
 import (
-	"personal-budget/config"
 	"strings"
 )
 
 func fromTo(category string) string {
-	text, ok := config.Categories[category]
+	text, ok := Categories[category]
 
 	if ok {
 		return text
@@ -16,7 +15,7 @@ func fromTo(category string) string {
 }
 
 func ConvertCompany(company string) string {
-	for key, value := range config.Companies {
+	for key, value := range Companies {
 		content := strings.Contains(strings.ToUpper(company), strings.ToUpper(key))
 		if content {
 			return value

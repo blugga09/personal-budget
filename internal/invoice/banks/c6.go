@@ -1,16 +1,16 @@
-package c6
+package banks
 
 import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"personal-budget/banks"
-	"personal-budget/domain"
+	"personal-budget/internal/helper"
+	"personal-budget/internal/invoice/domain"
 	"strconv"
 	"strings"
 )
 
-func ReadFile(bank string, path string, info os.FileInfo) ([]domain.Purchase, error) {
+func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func ReadFile(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 			TotalInstallment:   totalInstallment,
 			Bank:               bank,
 			Number:             strings.TrimSpace(row[2]),
-			Category:           banks.ConvertCategory(category, description),
+			Category:           helper.ConvertCategory(category, description),
 			Value:              strings.ReplaceAll(strings.TrimSpace(row[8]), ".", ","),
 			Tags:               strings.Join(strings.Split(rawCategory, " / "), ","),
 		})

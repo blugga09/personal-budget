@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	c6 "personal-budget/banks/C6"
-	"personal-budget/domain"
+	"personal-budget/internal/invoice/banks"
+	"personal-budget/internal/invoice/domain"
 	"strings"
 )
 
 func Generate() {
-	outFile, err := os.Create("faturas_consolidadas.csv")
+	outFile, err := os.Create("./export/invoices/faturas_consolidadas.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +25,7 @@ func Generate() {
 		"Banco", "Número", "Categoria", "Valor", "Tags",
 	})
 
-	err = filepath.Walk("invoices", func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk("./import/invoices", func(path string, info os.FileInfo, err error) error {
 		purchases := []domain.Purchase{}
 
 		if err != nil {
@@ -40,11 +40,10 @@ func Generate() {
 
 		switch bank {
 		case "c6":
-			purchases, err = c6.ReadFile(bank, path, info)
+			purchases, err = banks.ImportC6(bank, path, info)
 		}
 
 		for _, p := range purchases {
-
 			writer.Write(p.ToArray())
 		}
 
@@ -55,5 +54,5 @@ func Generate() {
 		panic(err)
 	}
 
-	fmt.Println("Arquivo consolidado gerado com sucesso:")
+	fmt.Println("Faturas exportadas")
 }
