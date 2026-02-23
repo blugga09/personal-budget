@@ -1,3 +1,4 @@
 /invoices
 /config/company_category.json
 *.csv
+database.db

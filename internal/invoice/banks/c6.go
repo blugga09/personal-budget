@@ -19,7 +19,7 @@ func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 
 	month := extractMonth(info.Name())
 
-	response := []domain.Purchase{}
+	purchases := []domain.Purchase{}
 
 	reader := csv.NewReader(file)
 	reader.FieldsPerRecord = -1
@@ -45,7 +45,7 @@ func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 		description := strings.TrimSpace(row[4])
 		currentInstallment, totalInstallment := extractInstallment(strings.TrimSpace(row[5]))
 
-		response = append(response, domain.Purchase{
+		purchases = append(purchases, domain.Purchase{
 			Date:               strings.TrimSpace(row[0]),
 			Month:              month,
 			Description:        description,
@@ -56,10 +56,11 @@ func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 			Category:           helper.ConvertCategory(category, description),
 			Value:              strings.ReplaceAll(strings.TrimSpace(row[8]), ".", ","),
 			Tags:               strings.Join(strings.Split(rawCategory, " / "), ","),
+			Content:            strings.Join(row, ";"),
 		})
 	}
 
-	return response, nil
+	return purchases, nil
 }
 
 func formatMonth(date string) string {
