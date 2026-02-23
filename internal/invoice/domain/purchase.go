@@ -1,6 +1,7 @@
 package domain
 
 type Purchase struct {
+	ID                 int64
 	Date               string
 	Month              string
 	Description        string
@@ -11,6 +12,7 @@ type Purchase struct {
 	Category           string
 	Value              string
 	Tags               string
+	Content            string
 }
 
 func (p Purchase) ToArray() []string {
@@ -25,5 +27,11 @@ func (p Purchase) ToArray() []string {
 		p.Category,
 		p.Value,
 		p.Tags,
+		p.Content,
 	}
+}
+
+type PurchaseRepository interface {
+	Create(purchase *Purchase) error
+	Find(description string) (*Purchase, error)
 }

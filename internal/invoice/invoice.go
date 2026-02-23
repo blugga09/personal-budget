@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	enterprise "personal-budget/internal/enterprise/domain"
 	"personal-budget/internal/invoice/banks"
 	"personal-budget/internal/invoice/domain"
 	"strings"
 )
 
-func Generate() {
+func Generate(repository domain.PurchaseRepository, enterprises []*enterprise.Enterprise) {
 	outFile, err := os.Create("./export/invoices/faturas_consolidadas.csv")
 	if err != nil {
 		panic(err)
@@ -21,8 +22,7 @@ func Generate() {
 	defer writer.Flush()
 
 	writer.Write([]string{
-		"Data compra", "Mês fatura", "Descrição", "Parcela", "Total",
-		"Banco", "Número", "Categoria", "Valor", "Tags",
+		"Data compra", "Mês fatura", "Descrição", "Parcela", "Total", "Banco", "Número", "Categoria", "Valor", "Tags",
 	})
 
 	err = filepath.Walk("./import/invoices", func(path string, info os.FileInfo, err error) error {
@@ -45,6 +45,7 @@ func Generate() {
 
 		for _, p := range purchases {
 			writer.Write(p.ToArray())
+			repository.Create(&p)
 		}
 
 		return nil
