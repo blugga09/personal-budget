@@ -1,6 +1,7 @@
 package domain
 
 type Moviment struct {
+	ID          int64
 	Date        string
 	Month       string
 	Description string
@@ -9,6 +10,7 @@ type Moviment struct {
 	Method      string
 	Value       string
 	Tags        string
+	Content     string
 }
 
 func (m Moviment) ToArray() []string {
@@ -21,5 +23,6 @@ func (m Moviment) ToArray() []string {
 		m.Method,
 		m.Value,
 		m.Tags,
+		m.Content,
 	}
 }
