@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	enterprise "personal-budget/internal/enterprise/domain"
 	"personal-budget/internal/statement/banks"
 	"personal-budget/internal/statement/domain"
 	"strings"
 )
 
-func Generate() {
+func Generate(repository domain.MovimentRepository, enterprises []*enterprise.Enterprise) {
 	outFile, err := os.Create("./export/statements/extratos_consolidados.csv")
 	if err != nil {
 		panic(err)
@@ -41,6 +42,7 @@ func Generate() {
 
 		for _, m := range moviments {
 			writer.Write(m.ToArray())
+			repository.Create(&m)
 		}
 
 		return nil

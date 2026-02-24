@@ -26,3 +26,8 @@ func (m Moviment) ToArray() []string {
 		m.Content,
 	}
 }
+
+type MovimentRepository interface {
+	Create(purchase *Moviment) error
+	Find(description string) (*Moviment, error)
+}
