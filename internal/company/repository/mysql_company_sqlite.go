@@ -3,28 +3,28 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"personal-budget/internal/enterprise/domain"
+	"personal-budget/internal/company/domain"
 )
 
-type sqliteEnterpriseRepository struct {
+type sqliteCompanyRepository struct {
 	db *sql.DB
 }
 
-func NewSqliteEnterpriseRepository(db *sql.DB) *sqliteEnterpriseRepository {
-	return &sqliteEnterpriseRepository{
+func NewSqliteCompanyRepository(db *sql.DB) *sqliteCompanyRepository {
+	return &sqliteCompanyRepository{
 		db: db,
 	}
 }
 
-func (repository *sqliteEnterpriseRepository) Create(enterprise *domain.Enterprise) error {
-	stmt, err := repository.db.Prepare(`insert into enterprises (description, category, tags) values (?,?,?)`)
+func (repository *sqliteCompanyRepository) Create(company *domain.Company) error {
+	stmt, err := repository.db.Prepare(`insert into companies (description, category, tags) values (?,?,?)`)
 	if err != nil {
 		return err
 	}
 	_, err = stmt.Exec(
-		enterprise.Name,
-		enterprise.Category,
-		enterprise.Tags,
+		company.Name,
+		company.Category,
+		company.Tags,
 	)
 
 	if err != nil {
@@ -39,8 +39,8 @@ func (repository *sqliteEnterpriseRepository) Create(enterprise *domain.Enterpri
 	return nil
 }
 
-func (repository *sqliteEnterpriseRepository) All() ([]*domain.Enterprise, error) {
-	stmt, err := repository.db.Prepare(`select name, category, tags from enterprises`)
+func (repository *sqliteCompanyRepository) All() ([]*domain.Company, error) {
+	stmt, err := repository.db.Prepare(`select name, category, tags from companies`)
 	if err != nil {
 		return nil, err
 	}
@@ -51,20 +51,20 @@ func (repository *sqliteEnterpriseRepository) All() ([]*domain.Enterprise, error
 		return nil, err
 	}
 
-	var enterprises []*domain.Enterprise
+	var companies []*domain.Company
 	for rows.Next() {
-		var enterprise domain.Enterprise
-		err = rows.Scan(&enterprise.Name, &enterprise.Category, &enterprise.Tags)
+		var company domain.Company
+		err = rows.Scan(&company.Name, &company.Category, &company.Tags)
 		if err != nil {
 			return nil, err
 		}
 
-		enterprises = append(enterprises, &enterprise)
+		companies = append(companies, &company)
 	}
 
-	if len(enterprises) == 0 {
+	if len(companies) == 0 {
 		return nil, errors.New("Not Found")
 	}
 
-	return enterprises, nil
+	return companies, nil
 }

@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	enterprise_repository "personal-budget/internal/enterprise/repository"
+	company "personal-budget/internal/company"
+	company_repository "personal-budget/internal/company/repository"
 	"personal-budget/internal/invoice"
 	purchase_repository "personal-budget/internal/invoice/repository"
 	"personal-budget/internal/statement"
@@ -21,15 +22,15 @@ func main() {
 	defer db.Close()
 
 	purchaseRepository := purchase_repository.NewSqlitePurchaseRepository(db)
-	enterpriseRepository := enterprise_repository.NewSqliteEnterpriseRepository(db)
+	companyRepository := company_repository.NewSqliteCompanyRepository(db)
 	movimentRepository := moviment_repository.NewSqliteMovimentRepository(db)
-	enterprises, err := enterpriseRepository.All()
+	companyService := company.NewService(companyRepository)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	invoice.Generate(purchaseRepository, enterprises)
-	statement.Generate(movimentRepository, enterprises)
+	invoice.Generate(purchaseRepository, companyService)
+	statement.Generate(movimentRepository, companyService)
 
 	fmt.Println("Arquivo consolidado gerado com sucesso:")
 }

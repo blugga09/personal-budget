@@ -18,13 +18,13 @@ func NewService(repository domain.CompanyRepository) *Service {
 	return &Service{companies}
 }
 
-func (s *Service) searchCategory(company string) string {
+func (s *Service) SearchCategory(company string) *domain.Company {
 	for _, c := range s.companies {
 		content := strings.Contains(strings.ToUpper(c.Name), strings.ToUpper(company))
 		if content {
-			return c.Category
+			return c
 		}
 	}
 
-	return ""
+	return nil
 }
