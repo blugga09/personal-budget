@@ -4,20 +4,27 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	company "personal-budget/internal/company"
 	"personal-budget/internal/helper"
 	"personal-budget/internal/invoice/domain"
 	"strconv"
 	"strings"
 )
 
-func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, error) {
+type C6 struct {
+	CompanyService *company.Service
+}
+
+const BANK = "c6"
+
+func (c C6) Import(path string, date string) ([]domain.Purchase, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	month := extractMonth(info.Name())
+	month := c.extractMonth(date)
 
 	purchases := []domain.Purchase{}
 
@@ -40,10 +47,8 @@ func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 			continue
 		}
 
-		rawCategory := strings.TrimSpace(row[3])
-		category := strings.TrimSpace(strings.Split(rawCategory, "/")[0])
-		description := strings.TrimSpace(row[4])
-		currentInstallment, totalInstallment := extractInstallment(strings.TrimSpace(row[5]))
+		currentInstallment, totalInstallment := c.extractInstallment(strings.TrimSpace(row[5]))
+		description, category, tags := c.extractInfo(strings.TrimSpace(row[3]), strings.TrimSpace(row[4]))
 
 		purchases = append(purchases, domain.Purchase{
 			Date:               strings.TrimSpace(row[0]),
@@ -51,11 +56,11 @@ func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 			Description:        description,
 			CurrentInstallment: currentInstallment,
 			TotalInstallment:   totalInstallment,
-			Bank:               bank,
+			Bank:               BANK,
 			Number:             strings.TrimSpace(row[2]),
-			Category:           helper.ConvertCategory(category, description),
+			Category:           category,
 			Value:              strings.ReplaceAll(strings.TrimSpace(row[8]), ".", ","),
-			Tags:               strings.Join(strings.Split(rawCategory, " / "), ","),
+			Tags:               tags,
 			Content:            strings.Join(row, ";"),
 		})
 	}
@@ -63,7 +68,7 @@ func ImportC6(bank string, path string, info os.FileInfo) ([]domain.Purchase, er
 	return purchases, nil
 }
 
-func formatMonth(date string) string {
+func (c C6) formatMonth(date string) string {
 	if len(date) < 7 {
 		return "indefinido"
 	}
@@ -72,17 +77,17 @@ func formatMonth(date string) string {
 	return fmt.Sprintf("01/%s/%s", month, year)
 }
 
-func extractMonth(fileName string) string {
+func (c C6) extractMonth(fileName string) string {
 	name := strings.TrimSuffix(fileName, ".csv")
 	part := strings.Split(name, "_")
 	if len(part) < 2 {
 		return ""
 	}
 	date := part[1]
-	return formatMonth(date)
+	return c.formatMonth(date)
 }
 
-func extractInstallment(installment string) (string, string) {
+func (c C6) extractInstallment(installment string) (string, string) {
 	currentInstallment := "1"
 	totalInstallment := "1"
 	if strings.Contains(installment, "/") {
@@ -96,4 +101,14 @@ func extractInstallment(installment string) (string, string) {
 		totalInstallment = "1"
 	}
 	return currentInstallment, totalInstallment
+}
+
+func (c C6) extractInfo(category string, description string) (string, string, string) {
+	comp := c.CompanyService.SearchCategory(description)
+	if comp != nil {
+		return comp.Name, comp.Category, comp.Tags
+	}
+
+	category = helper.ConvertCategory(strings.TrimSpace(strings.Split(category, "/")[0]), description)
+	return description, category, strings.Join(strings.Split(category, " / "), ",")
 }

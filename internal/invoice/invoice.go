@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	enterprise "personal-budget/internal/enterprise/domain"
+	company "personal-budget/internal/company"
 	"personal-budget/internal/invoice/banks"
 	"personal-budget/internal/invoice/domain"
 	"strings"
 )
 
-func Generate(repository domain.PurchaseRepository, enterprises []*enterprise.Enterprise) {
+func Generate(repository domain.PurchaseRepository, companyService *company.Service) {
 	outFile, err := os.Create("./export/invoices/faturas_consolidadas.csv")
 	if err != nil {
 		panic(err)
@@ -37,10 +37,11 @@ func Generate(repository domain.PurchaseRepository, enterprises []*enterprise.En
 		}
 
 		bank := filepath.Base(filepath.Dir(path))
+		date := info.Name()
 
 		switch bank {
 		case "c6":
-			purchases, err = banks.ImportC6(bank, path, info)
+			purchases, err = banks.C6{CompanyService: companyService}.Import(path, date)
 		}
 
 		for _, p := range purchases {
