@@ -28,7 +28,7 @@ CREATE TABLE purchases (
     created_at          DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE enterprises (
+CREATE TABLE companies (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
     name                TEXT,
     category            TEXT,
