@@ -20,7 +20,7 @@ func NewService(repository domain.CompanyRepository) *Service {
 
 func (s *Service) SearchCategory(company string) *domain.Company {
 	for _, c := range s.companies {
-		content := strings.Contains(strings.ToUpper(c.Name), strings.ToUpper(company))
+		content := strings.Contains(strings.ToUpper(company), strings.ToUpper(c.Name))
 		if content {
 			return c
 		}
