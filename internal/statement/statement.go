@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	enterprise "personal-budget/internal/enterprise/domain"
+	company "personal-budget/internal/company"
 	"personal-budget/internal/statement/banks"
 	"personal-budget/internal/statement/domain"
 	"strings"
 )
 
-func Generate(repository domain.MovimentRepository, enterprises []*enterprise.Enterprise) {
+func Generate(repository domain.MovimentRepository, companyService *company.Service) {
 	outFile, err := os.Create("./export/statements/extratos_consolidados.csv")
 	if err != nil {
 		panic(err)
@@ -37,8 +37,7 @@ func Generate(repository domain.MovimentRepository, enterprises []*enterprise.En
 		}
 
 		bank := filepath.Base(filepath.Dir(path))
-
-		moviments, err = readFile(bank, path)
+		moviments, err = readFile(bank, path, companyService)
 
 		for _, m := range moviments {
 			writer.Write(m.ToArray())
@@ -55,7 +54,7 @@ func Generate(repository domain.MovimentRepository, enterprises []*enterprise.En
 	fmt.Println("Extratos exportadas")
 }
 
-func readFile(bank string, path string) ([]domain.Moviment, error) {
+func readFile(bank string, path string, companyService *company.Service) ([]domain.Moviment, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -73,6 +72,8 @@ func readFile(bank string, path string) ([]domain.Moviment, error) {
 		return nil, err
 	}
 
+	var m domain.Moviment
+
 	for i, row := range lines {
 		if i == 0 {
 			continue
@@ -80,8 +81,10 @@ func readFile(bank string, path string) ([]domain.Moviment, error) {
 
 		switch bank {
 		case "picpay":
-			moviments = append(moviments, banks.ImportPicpay(row))
+			m = banks.Picpay{CompanyService: companyService}.Import(row)
 		}
+
+		moviments = append(moviments, m)
 	}
 
 	return moviments, nil
