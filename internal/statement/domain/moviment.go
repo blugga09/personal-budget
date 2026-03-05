@@ -23,7 +23,6 @@ func (m Moviment) ToArray() []string {
 		m.Method,
 		m.Value,
 		m.Tags,
-		m.Content,
 	}
 }
 
