@@ -2,3 +2,4 @@
 /config/company_category.json
 *.csv
 database.db
+.DS_Store
