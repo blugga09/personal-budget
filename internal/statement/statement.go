@@ -82,6 +82,8 @@ func readFile(bank string, path string, companyService *company.Service) ([]doma
 		switch bank {
 		case "picpay":
 			m = banks.Picpay{CompanyService: companyService}.Import(row)
+		case "c6":
+			m = banks.C6{CompanyService: companyService}.Import(row)
 		}
 
 		moviments = append(moviments, m)
