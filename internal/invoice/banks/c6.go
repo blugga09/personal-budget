@@ -106,7 +106,7 @@ func (c C6) extractInstallment(installment string) (string, string) {
 func (c C6) extractInfo(category string, description string) (string, string, string) {
 	comp := c.CompanyService.SearchCategory(description)
 	if comp != nil {
-		return comp.Name, comp.Category, comp.Tags
+		return description, comp.Category, comp.Tags
 	}
 
 	category = helper.ConvertCategory(strings.TrimSpace(strings.Split(category, "/")[0]), description)

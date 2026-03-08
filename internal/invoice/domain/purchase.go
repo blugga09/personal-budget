@@ -27,7 +27,6 @@ func (p Purchase) ToArray() []string {
 		p.Category,
 		p.Value,
 		p.Tags,
-		p.Content,
 	}
 }
 

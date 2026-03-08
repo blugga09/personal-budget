@@ -12,8 +12,6 @@ type Picpay struct {
 	CompanyService *company.Service
 }
 
-const BANK = "picpay"
-
 func (p Picpay) Import(row []string) domain.Moviment {
 
 	date, month := p.formatDate(row[0])
@@ -24,7 +22,7 @@ func (p Picpay) Import(row []string) domain.Moviment {
 		Month:       month,
 		Description: description,
 		Category:    category,
-		Bank:        BANK,
+		Bank:        "picpay",
 		Method:      p.method(row[2]),
 		Value:       p.formatMoney(row[4]),
 		Tags:        tags,
@@ -62,7 +60,7 @@ func (p Picpay) method(value string) string {
 func (p Picpay) extractInfo(category string, description string) (string, string, string) {
 	comp := p.CompanyService.SearchCategory(description)
 	if comp != nil {
-		return comp.Name, comp.Category, comp.Tags
+		return description, comp.Category, comp.Tags
 	}
 
 	category = helper.ConvertCategory(strings.TrimSpace(strings.Split(category, "/")[0]), description)
